@@ -1,0 +1,60 @@
+# HTML
+
+# Archive your static HTML project and save it with the build record.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+pool:
+  vmImage: 'ubuntu-latest'
+variables:
+  npm_config_cache: $(Pipeline.Workspace)/.npm
+trigger:
+  - develop
+
+steps:
+- task: npmAuthenticate@0
+  inputs:
+    workingFile: '$(Build.SourcesDirectory)/.npmrc'
+- task: Cache@2
+  inputs:
+    key: 'npm | "$(Agent.OS)" | package-lock.json'
+    restoreKeys: |
+       npm | "$(Agent.OS)"
+    path: $(npm_config_cache)
+  displayName: Cache npm
+- script: npm ci
+- task: CmdLine@2
+  displayName: npm Build Modules
+  inputs:
+    workingDirectory: $(Build.SourcesDirectory)
+    script: 'npm run build:dev'
+ 
+- task: S3Upload@1
+  inputs:
+    awsCredentials: 'AWS-S3-Connection (F1-React-HTML Deployment)'
+    regionName: 'eu-central-1'
+    bucketName: 'f1-unlocked-html'
+    sourceFolder: '$(Build.SourcesDirectory)/build'
+    globExpressions: '**'
+    targetFolder: 'dev'
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'AWS-S3-Connection (F1-React-HTML Deployment)'
+    regionName: 'eu-central-1'
+    awsCommand: 'cloudfront'
+    awsSubCommand: 'create-invalidation'
+    awsArguments: '--distribution-id E1WO8WCR3AXZ5T --paths "/index.html" "/ascendonController.js" "/react/*"'
+- task: CopyFiles@2
+  inputs:
+      SourceFolder: '$(Build.SourcesDirectory)/build'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
+  condition: eq(variables['PUBLISH_ARTIFACT'], 'true')
+
+- task: PublishBuildArtifacts@1
+  inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'F1_build_$(buildDate)'
+      publishLocation: 'Container'
+  condition: eq(variables['PUBLISH_ARTIFACT'], 'true')

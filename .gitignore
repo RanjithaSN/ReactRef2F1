@@ -1,0 +1,17 @@
+build
+dist
+node_modules
+coverage
+stats.json
+npm-debug.log
+.tmp
+.DS_Store
+.eslintcache
+.idea
+.husky/_
+# cypress
+cypress/videos
+cypress/screenshots
+.nyc_output
+coverage
+/ascendon-web-api

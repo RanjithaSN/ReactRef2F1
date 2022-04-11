@@ -1,0 +1,18 @@
+{
+  "environment": "prod",
+  "basename": "/react",
+  "iframeUrl": "//account.formula1.com/react/",
+  "acceptedOrigin": [
+    "f1.lbi.co.uk",
+    "formula1.com",
+    "watchliveformula1.com"
+  ],
+  "metadataUrl": "https://metadata.prd3.contentdirect.tv",
+  "apiUrl": "https://services.prd3.contentdirect.tv",
+  "systemId": "60a9ad84-e93d-480f-80d6-af37494f2e22",
+  "channelId": "d861e38f-05ea-4063-8776-a7e2b6d885a4",
+  "deviceType": 4,
+  "country": "USA",
+  "language": "en-GB",
+  "externalValidationRulesUrl": "/react/password_config.json"
+}

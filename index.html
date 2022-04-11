@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Ascendon Test Harness</title>
+  <meta
+  name="viewport"
+  content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
+/>
+<style>
+  html,body, .ascendon {
+    height: 100%;
+    margin: 0;
+    background-color: #f7f4f1;
+  }
+  iframe {
+    width: 100%;
+    min-width: 320px;
+  }
+  body{
+    font-family: sans-serif;
+    padding: 0px;
+  }
+  .options {
+    margin-top: 10px;
+    margin-left: 10px;
+    height: 80px;
+    width: 100%;
+  }
+  .hidden {
+    display: none;
+  }
+
+  .api-details {
+    display: block;
+  }
+
+  .api-row {
+    position: relative;
+  }
+  .api-row label {
+    display: inline-block;
+    width: 150px;
+  }
+
+  .api-row input {
+    display: inline-block;
+    width: 300px;
+  }
+
+</style>
+</head>
+
+<body>
+    <div id="ascendon-controller">
+      <div>
+        <label>Profile Type:</label>
+        <select name="profileType" id="profile-type">
+          <option value="UNLOCKED_FULL">UNLOCKED_FULL</option>
+          <option value="UNLOCKED_SKINNY">UNLOCKED_SKINNY</option>
+          <option value="UNLOCKED_SKINNY_DOB">UNLOCKED_SKINNY_DOB</option>
+          <option value="DATA_CAPTURE">DATA_CAPTURE</option>
+        </select>
+        <button type='button' onclick="launchRoute('registration')">Launch</button>
+        <button type='button' onclick="launchRoute('my-account')">My Account</button>
+        <button type='button' onclick="launchRoute('OrderHistory')">OrderHistory</button>
+        <button type='button' onclick="launchRoute('my-subscription')">My Subscription</button>
+
+        <button id="show-additional-options" type='button' onclick="hideOrShowOptions()">Show Options</button>
+        <button id="hide-additional-options" class="hidden" type='button' onclick="hideOrShowOptions()">Hide Options</button>
+        <label>Language:</label>
+        <select name="language" id="current-lang" onchange="changeLanguage()">
+          <option value="en-GB">en-GB</option>
+          <option value="fr-FR">fr-FR</option>
+          <option value="es-MX">es-MX</option>
+          <option value="de-DE">de-DE</option>
+          <option value="nl-NL">nl-NL</option>
+          <option value="pt-BR">pt-BR</option>
+        </select>
+        <label>Theme:</label>
+        <select name="theme" id="current-theme" onchange="changeTheme()">
+          <option value="default">Default</option>
+        </select>
+      </div>
+      <div class="options hidden" id="additional-options">
+        <div> <!-- Options -->
+          <label>Show Back Button:</label>
+          <select name="show-back-button" id="show-back-button">
+            <option value="boolean-default">Default</option>
+            <option value="boolean-enabled">Enabled</option>
+            <option value="boolean-disabled">Disabled</option>
+          </select>
+          <label>Show Sign In:</label>
+          <select name="show-signin-button" id="show-signin-button">
+            <option value="boolean-default">Default</option>
+            <option value="boolean-enabled">Enabled</option>
+            <option value="boolean-disabled">Disabled</option>
+          </select>
+          <label>Lead Source:</label>
+          <input type="text" id="lead-source" name="lead-source" value="web_f1core">
+        </div>
+        <div class="api-details">
+          <div class="api-row">
+            <label for="api-key">Apigee API Key:</label>
+            <input type="text" id="api-key" name="api-key" value=""><br>
+          </div>
+          <div class="api-row">
+            <label for="api-url">Apigee API URL:</label>
+            <input type="text" id="api-url" name="api-url" value="https://services.sbx1.cdops.net"><br>
+          </div> 
+        </div>
+      </div>
+      </div>
+    </div>
+    <div id="ascendon"></div>
+    <script>
+      window.CSG_CONFIG = {
+        iframeUrl: 'http://localhost:9000', 
+        container: 'ascendon', 
+      }
+    </script>
+    <script src="./ascendonController.js"></script>
+    
+    <script>
+      var optionsShown = false;
+      var currentRoute = '/';
+      redirectToRoute = (route, addParams) => {
+        currentRoute = route;
+        var additionalParams = {};
+        if (addParams) {
+          if (typeof addParams === 'string') {
+            additionalParams = JSON.parse(addParams);
+          } else {
+            additionalParams = addParams
+          }
+        }
+
+        console.log(`OK REDIRECT USING : `, route, additionalParams);
+        ascendon.controller.route(
+          route, 
+          {
+            controllerPath: window.location.origin,
+            ...additionalParams,
+          },
+          () => {
+            console.info('route changed... do something.');
+          }
+        );
+      };
+
+      function changeLanguage() {
+        launchRoute();
+      }
+
+      function changeTheme() {
+        launchRoute('registration');
+      }
+
+      function hideOrShowOptions() {
+        optionsShown = !optionsShown;
+
+        // Add or remove display block/hide depending on options shown
+        showElement('additional-options', optionsShown);
+        showElement('show-additional-options', !optionsShown);
+        showElement('hide-additional-options', optionsShown);
+      }
+
+      function showElement(id, shouldShow) {
+        var element = document.getElementById(id);
+        if (shouldShow) {
+          element.classList.remove("hidden");
+        } else {
+          element.classList.add("hidden");
+        }
+      }
+
+      function getValueFromElement(id) {
+        const element = document.getElementById(id);
+        if (element) {
+          return element.value;
+        }
+        return "";
+      }
+
+      function addParameterIfValid(params, identifier, value) {
+        if (value && value.length > 0) {
+
+          if (value.indexOf("boolean-") === 0) {
+            if (value === "boolean-enabled") {
+              params[identifier] = true;
+            } else if (value === "boolean-disabled") {
+              params[identifier] = false;
+            }
+          } else {
+            params[identifier] = value;
+          }
+        }
+      }
+
+      function launchRoute(route) {
+        var profileType = getValueFromElement("profile-type");
+        var langSelect = getValueFromElement("current-lang");
+        var themeSelect = getValueFromElement("current-theme");
+        var apiKey = getValueFromElement("api-key");
+        var staticApiUrl = getValueFromElement("static-api-url");
+        var apiUrl = getValueFromElement("api-url");
+        var apiUrl = getValueFromElement("api-url");
+        var showBackButton = getValueFromElement("show-back-button");
+        var showSignInButton = getValueFromElement("show-signin-button");
+        var leadSource = getValueFromElement("lead-source");
+
+        // var route = 'registration';
+        var params = {
+          profileType,
+          language: langSelect,
+          theme: themeSelect,
+        };
+
+        addParameterIfValid(params, "apiKey", apiKey);
+        addParameterIfValid(params, "staticApiUrl", staticApiUrl);
+        addParameterIfValid(params, "apiUrl", apiUrl);
+        addParameterIfValid(params, "apiUrl", apiUrl);
+        addParameterIfValid(params, "showBackButton", showBackButton);
+        addParameterIfValid(params, "showAlreadyHaveAccountMessage", showSignInButton);
+        addParameterIfValid(params, "leadSource", leadSource);
+
+        redirectToRoute(route, params);
+      }
+
+      /***Custom Event Listener***/
+      ascendon.controller.events(function (params, event) {
+        const stringParams = JSON.stringify(params);
+        const eventName = params.eventName || '';
+
+        switch(eventName) {
+          case 'module.error':
+            console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+            break;
+          case 'subscriber.created':
+            console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+            break;
+          case 'subscriber.error':
+            console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+            break;
+          case 'module.backButton':
+            console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+            break;
+          case 'module.loginButton':
+            console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+            break;
+          case 'module.termsAndConditionsButton':
+            console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+            break;
+          case 'module.privayPolicyButton':
+            console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+            break;
+          default:
+            console.info(`[UNKNOWN] ${eventName}: ${stringParams}`);
+            break;
+        }
+      });
+    </script>
+</body>
+</html>

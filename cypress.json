@@ -1,0 +1,16 @@
+{
+  "baseUrl": "http://localhost:9000",
+  "chromeWebSecurity": false,
+  "experimentalStudio": true,
+  "env": {
+    "HOST": "http://localhost:9000"
+  },
+  "component": {
+    "componentFolder": "src",
+    "testFiles": "**/*spec.{js,jsx,ts,tsx}"
+  },
+  "integrationFolder": "src",
+  "fixturesFolder": "cypress/fixtures",
+  "testFiles": "**/*spec.{js,jsx,ts,tsx}",
+  "video": false
+}

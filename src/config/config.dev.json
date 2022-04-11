@@ -1,0 +1,19 @@
+{
+  "environment": "dev",
+  "basename": "/react",
+  "iframeUrl": "//f1-dev.demo.cdops.net/react/",
+  "acceptedOrigin": [
+    "f1-dev.demo.cdops.net",
+    "f1-sbx.demo.cdops.net",
+    "f1.lbi.co.uk",
+    "formula1.com"
+  ],
+  "metadataUrl": "https://metadata.sbx1.cdops.net",
+  "apiUrl": "https://services.sbx1.cdops.net",
+  "systemId": "14096c47-cbda-4cd3-923e-47943b845a0e",
+  "channelId": "3de19ec6-1e66-4534-bb55-b6a49e6c2771",
+  "deviceType": 4,
+  "country": "USA",
+  "language": "en-GB",
+  "externalValidationRulesUrl": "/react/password_config.json"
+}

@@ -1,0 +1,92 @@
+<html>
+<head>
+  <title>CSG Skinny Profile Widget POC</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <h1>CSG Skinny Profile Widget POC</h1>
+
+    <!-- container for CSG iFrame-->
+    <div id="skinny-profile-widget-container"></div>
+
+    
+    <script>
+
+      window.CSG_CONFIG = {
+        // iframeUrl: '//f1-sbx.demo.cdops.net/react/',
+        iframeUrl: '//localhost:9000',
+        container: 'skinny-profile-widget-container' 
+      }
+
+      //Load CSG cotroller and update iFrame route
+      loadScript();
+
+      function loadScript() {
+
+          //$.getScript("https://f1-sbx.demo.cdops.net/ascendonController.js", function () { 
+          // $.getScript("https://f1-dev.demo.cdops.net/ascendonController.js", function () { 
+          $.getScript("./ascendonController.js", function () {
+
+
+             /***Custom Event Listener***/
+          ascendon.controller.events(function (params, event) {
+            const stringParams = JSON.stringify(params);
+            const eventName = params.eventName || '';
+
+            switch(eventName) {
+              case 'module.error':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                break;
+              case 'subscriber.created':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                break;
+              case 'subscriber.error':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                break;
+              case 'module.backButton':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                break;
+              case 'module.loginButton':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                break;
+              case 'module.termsAndConditionsButton':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                break;
+              case 'module.privayPolicyButton':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                break;
+              case 'module.ready':
+                console.info(`[CUSTOM_EVENT2] ${eventName}: ${stringParams}`);
+                ascendon.controller.route("registration", {
+                  "language": "en-GB",
+                  "theme": "default",
+                  "apiKey": "xxxxxxxxxxx",
+                  "apiUrl": "https://qa-api.f1.lbi.co.uk/v1/account",
+                  "apiKey": "",
+                  "apiUrl": "https://services.sbx1.cdops.net",
+                  "leadSource": "web_f1core",
+                  "showBackButton": true,
+                  "profileType": "UNLOCKED_SKINNY",
+                  "showSignInButton": true,
+                  "controllerPath": window.location.origin,
+                }, () => {
+                  console.log(`OK ROUTE TO REGISTRATION`);
+                }
+                );
+                break;
+              default:
+                console.info(`[UNKNOWN] ${eventName}: ${stringParams}`);
+                break;
+            }
+          });
+
+        });
+      }
+          
+    </script>
+
+</body>
+
+</html>
